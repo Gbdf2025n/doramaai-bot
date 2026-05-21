@@ -162,6 +162,7 @@ async function animateImageWithReplicate(
 
     if (!createRes.ok) {
       const errText = await createRes.text();
+      console.error("Replicate error:", createRes.status, errText.slice(0, 500));
       logger.error(
         { status: createRes.status, body: errText.slice(0, 300) },
         "VideoGen: Replicate prediction creation failed",
@@ -275,7 +276,8 @@ async function animateImageWithReplicate(
       "VideoGen: Replicate prediction timed out after 5 minutes",
     );
     return null;
-  } catch (err) {
+  } catch (err: any) {
+    console.error("Replicate animation exception:", err?.message, err?.code, err?.cause);
     logger.error({ err }, "VideoGen: Replicate animation error");
     return null;
   }
