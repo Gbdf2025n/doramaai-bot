@@ -142,8 +142,8 @@ async function animateImageWithReplicate(
       "VideoGen: creating Replicate prediction for image animation",
     );
 
-    // Create prediction
-    const createRes = await fetch(`${REPLICATE_BASE}/predictions`, {
+    // Create prediction using models endpoint
+    const createRes = await fetch(`${REPLICATE_BASE}/models/${REPLICATE_MODEL}/predictions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${REPLICATE_API_TOKEN}`,
@@ -151,8 +151,6 @@ async function animateImageWithReplicate(
         Prefer: "respond-async",
       },
       body: JSON.stringify({
-        version: undefined,
-        model: REPLICATE_MODEL,
         input: {
           prompt:
             "gentle subtle movement, breathing, hair flowing in wind, cinematic",

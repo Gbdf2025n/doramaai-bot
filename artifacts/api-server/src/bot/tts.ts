@@ -68,6 +68,7 @@ function isoNow(): string {
 
 /**
  * Generate TTS audio using the free Microsoft Edge TTS WebSocket API.
+ * Includes automatic retry (up to 3 attempts) on WebSocket failures.
  *
  * @param text    - The text to synthesize
  * @param voiceId - Microsoft Neural voice ID (e.g. "pt-BR-ThalitaMultilingualNeural")
@@ -86,6 +87,26 @@ export async function generateTTSAudio(
     return null;
   }
 
+  const MAX_RETRIES = 3;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const result = await attemptTTS(text, voiceId, rate, pitch);
+    if (result) return result;
+    if (attempt < MAX_RETRIES) {
+      logger.info({ attempt, maxRetries: MAX_RETRIES }, "Edge TTS: retrying...");
+      await new Promise((r) => setTimeout(r, 1000 * attempt));
+    }
+  }
+
+  logger.error("Edge TTS: todas as tentativas falharam");
+  return null;
+}
+
+async function attemptTTS(
+  text: string,
+  voiceId: string,
+  rate: string,
+  pitch: string,
+): Promise<Buffer | null> {
   const requestId = generateRequestId();
   const ssml = buildSSML(text, voiceId, rate, pitch);
 
