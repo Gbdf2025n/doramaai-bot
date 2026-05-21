@@ -202,9 +202,9 @@ async function attemptTTS(
       }
     });
 
-    ws.on("error", (err) => {
+    ws.on("error", (err: Error & { code?: string }) => {
       clearTimeout(timeout);
-      logger.error({ err, requestId: requestId.slice(0, 8) }, "Edge TTS: erro no WebSocket");
+      logger.error({ err: err.message, code: err.code, stack: err.stack?.slice(0, 300), requestId: requestId.slice(0, 8) }, "Edge TTS: erro no WebSocket");
       try { ws.close(); } catch {}
       safeResolve(null);
     });

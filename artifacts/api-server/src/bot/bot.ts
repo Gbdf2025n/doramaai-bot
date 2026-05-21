@@ -48,6 +48,14 @@ export function startBot() {
   _bot = bot;
   logger.info("DoramaAI Bot started (polling)");
 
+  bot.on("polling_error", (err: Error & { code?: string; response?: { statusCode?: number } }) => {
+    logger.error({
+      message: err.message,
+      code: err.code,
+      statusCode: err.response?.statusCode,
+    }, "Telegram polling error");
+  });
+
   // ─── helpers ───────────────────────────────────────────────────────────────
 
   function getVoiceId(telegramId: string): string {
